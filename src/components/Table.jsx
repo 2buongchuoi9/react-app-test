@@ -21,7 +21,7 @@ const CheckComponent = ({ index, onChange, isCheck }) => {
 }
 
 const Table = ({ header, data }) => {
-    const [selectRow, setSelectRow] = useState([])
+    const [selectRow, setSelectRow] = useState({})
     const [checkAll, setCheckAll] = useState(false)
 
     console.log(selectRow)
@@ -35,27 +35,52 @@ const Table = ({ header, data }) => {
     }
 
     const handleOnChangeSelectRow = (index) => {
-        const selectedRow = data[index]
+        const selectedRowKey = data[index].key.key
 
-        if (selectRow.some((item) => item.key === selectedRow.key)) {
-            // Hủy chọn nếu đã chọn
-            setSelectRow(selectRow.filter((item) => item.key !== selectedRow.key))
-        } else {
-            // Chọn nếu chưa chọn
-            setSelectRow((prevSelectRow) => [...prevSelectRow, selectedRow])
-        }
+        setSelectRow((prev) => {
+            const newSelect = { ...prev }
+
+            if (newSelect[selectedRowKey]) {
+                delete newSelect[selectedRowKey]
+            } else {
+                newSelect[selectedRowKey] = true
+            }
+            return newSelect
+        })
+
+        // const selectedRow = data[index]
+
+        // if (selectRow.some((item) => item.key === selectedRow.key)) {
+        //     // Hủy chọn nếu đã chọn
+        //     setSelectRow(selectRow.filter((item) => item.key !== selectedRow.key))
+        // } else {
+        //     // Chọn nếu chưa chọn
+        //     setSelectRow((prevSelectRow) => [...prevSelectRow, selectedRow])
+        // }
     }
 
     const handleCheckAll = () => {
         setCheckAll(!checkAll)
 
         if (!checkAll) {
-            // Nếu chưa chọn tất cả, chọn tất cả các hàng
-            setSelectRow([...data])
+            const newSelect = {}
+            data.map((v) => {
+                newSelect[v.key] = true
+            })
+            setSelectRow(newSelect)
         } else {
-            // Nếu đã chọn tất cả, hủy chọn tất cả các hàng
-            setSelectRow([])
+            setSelectRow({})
         }
+
+        // setCheckAll(!checkAll)
+
+        // if (!checkAll) {
+        //     // Nếu chưa chọn tất cả, chọn tất cả các hàng
+        //     setSelectRow([...data])
+        // } else {
+        //     // Nếu đã chọn tất cả, hủy chọn tất cả các hàng
+        //     setSelectRow([])
+        // }
     }
 
     return (
@@ -101,7 +126,8 @@ const Table = ({ header, data }) => {
                                         <CheckComponent
                                             index={index}
                                             onChange={handleOnChangeSelectRow}
-                                            isCheck={selectRow.some((selected) => selected.key === item.key)}
+                                            isCheck={selectRow[item.key] || false}
+                                            // isCheck={selectRow.some((selected) => selected.key === item.key)}
                                         />
                                     </td>
                                     {Object.entries(item).map(([key, value], i) => {
