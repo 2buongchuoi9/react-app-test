@@ -1,15 +1,15 @@
 import Breadcrumbs from "./Breadcrumbs"
-import { IoIosSearch } from "react-icons/io"
+// import { IoIosSearch } from "react-icons/io"
 import { HiMiniUserCircle } from "react-icons/hi2"
 import { IoNotificationsCircle } from "react-icons/io5"
 import { MdSettings } from "react-icons/md"
 
 const DashboardNavbar = () => {
     return (
-        <div className="flex justify-between text-color">
+        <div className="flex justify-between text-color py-3 bg-slate-400/30 rounded-lg">
             <Breadcrumbs />
             <div className="flex justify-end space-x-3">
-                <div className="relative text-gray-600 ">
+                {/* <div className="relative text-gray-600 ">
                     <input
                         type="search"
                         placeholder="Search"
@@ -18,7 +18,7 @@ const DashboardNavbar = () => {
                     <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
                         <IoIosSearch />
                     </button>
-                </div>
+                </div> */}
                 <button className="flex items-center space-x-2 rounded-lg hover:bg-bg_hover px-2">
                     <HiMiniUserCircle className="w-6 h-6 text-inherit" />
                     <span className="text-color font-medium">sigin</span>

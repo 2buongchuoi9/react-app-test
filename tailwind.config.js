@@ -10,6 +10,7 @@ export default {
                 // hover: "#f0f0f0",
                 color: "#607D8B",
                 bg_hover: "#607d8b1a",
+                btn: "#1677ff",
             },
             width: { wrap: "80rem" },
         },

@@ -28,49 +28,48 @@ const Pagination = ({ page, totalPage, onChange, pageSizelist, pageSize }) => {
     return (
         <div className={`flex items-center justify-start space-x-5`}>
             <div className="flex items-center justify-start space-x-2">
-                <div className="bg-white p-4 flex items-center flex-wrap">
+                <div className="bg-white p-2 flex items-center flex-wrap text-sm">
                     <ul className="inline-flex">
                         <li>
-                            <button className="px-4 py-2 text-green-600 transition-colors duration-150 bg-white border border-r-0 border-green-600 rounded-l-lg focus:shadow-outline hover:bg-green-100">
+                            <button
+                                onClick={prev}
+                                disabled={page === 1}
+                                className="px-3 py-2 text-color transition-colors duration-150 bg-white border border-r-0 border-blue-500 rounded-l-lg focus:shadow-outline hover:bg-bg_hover"
+                            >
                                 Prev
                             </button>
                         </li>
                         {range(1, totalPage).map((pageNumber) => (
                             <li key={pageNumber}>
-                                <button className="px-4 py-2 text-green-600 transition-colors duration-150 bg-white border border-r-0 border-green-600 focus:shadow-outline">
+                                <button
+                                    key={pageNumber}
+                                    onClick={() => onChange({ page: pageNumber, pageSize })}
+                                    disabled={pageNumber === page}
+                                    className={cl(
+                                        "px-3 py-2 text-color transition-colors duration-150 border border-r-0 border-blue-500 focus:shadow-outline hover:bg-bg_hover",
+                                        { "bg-blue-200": page === pageNumber }
+                                    )}
+                                >
                                     {pageNumber}
                                 </button>
                             </li>
                         ))}
                         <li>
-                            <button className="px-4 py-2 text-green-600 transition-colors duration-150 bg-white border border-green-600 rounded-r-lg focus:shadow-outline hover:bg-green-100">
+                            <button
+                                onClick={next}
+                                disabled={page === totalPage}
+                                className="px-3 py-2 text-color transition-colors duration-150 bg-white border border-blue-500 rounded-r-lg focus:shadow-outline hover:bg-bg_hover"
+                            >
                                 Next
                             </button>
                         </li>
                     </ul>
                 </div>
-
-                <button className="flex items-center " onClick={prev} disabled={page === 1}>
-                    Previous
-                </button>
-                {range(1, totalPage).map((pageNumber) => (
-                    <button
-                        key={pageNumber}
-                        onClick={() => onChange({ page: pageNumber, pageSize })}
-                        disabled={pageNumber === page}
-                        className={cl(" bg-slate-500 py-1 px-2 rounded-md", { "bg-red-600": page === pageNumber })}
-                    >
-                        {pageNumber}
-                    </button>
-                ))}
-                <button className="flex items-center" onClick={next} disabled={page === totalPage}>
-                    Next
-                </button>
             </div>
 
             <div className="relative h-10 w-72 min-w-10">
                 <select
-                    className="peer h-full w-full rounded-[7px] border border-blue-gray-200 border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 empty:!bg-gray-900 focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
+                    className="peer h-full w-full rounded-[7px] border bg-white border-blue-gray-200 border-t-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200  focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                     value={pageSize}
                     onChange={handlePageSizeChange}
                 >
@@ -92,10 +91,10 @@ Pagination.propTypes = {
     pageSize: PropTypes.number,
 }
 
-// Pagination.defaultProps = {
-//     pageSizelist: [10, 30, 50],
-//     pageSize: 10,
-//     page: 1,
-// }
+Pagination.defaultProps = {
+    pageSizelist: [10, 30, 50],
+    pageSize: 10,
+    page: 1,
+}
 
 export default Pagination

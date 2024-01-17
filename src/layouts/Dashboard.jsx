@@ -3,11 +3,13 @@ import SideNav from "./component/SideNav"
 import DashboardNavbar from "./component/DashboardNavbar"
 // import Table from "~/components/Table"
 import { Route, Routes } from "react-router-dom"
+// import AddStudent from "~/pages/Admin/student/AddStudent"
+// import UpdateStudent from "~/pages/Admin/student/UpdateStudent"
 // import School from "~/pages/Admin/School"
 
 function Dashboard() {
     return (
-        <div className="min-h-screen bg-blue-gray-50 bg-opacity-50">
+        <div className="min-h-screen bg-white/45 ">
             <SideNav items={routes}></SideNav>
             <div className="p-4 ml-80 h-[1000px]">
                 <DashboardNavbar />
@@ -19,7 +21,7 @@ function Dashboard() {
                     <Routes>
                         {routes.map(
                             ({ layout, pages }) =>
-                                layout === "admin" && pages.map(({ path, element }) => <Route key={path} exact path={path} element={element} />)
+                                layout === "admin" && pages.map(({ path, element }) => <Route key={path} path={path} element={element} />)
                         )}
                     </Routes>
                 </div>

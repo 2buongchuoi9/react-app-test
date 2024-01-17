@@ -17,25 +17,28 @@ function SideNav({ items }) {
                     {items.map(({ layout, pages }, index) => {
                         return (
                             <ul key={index} className="space-y-1">
-                                {pages.map(({ icon, name, path }) => (
-                                    <li key={name}>
-                                        <NavLink to={`/${layout}${path}`}>
-                                            {({ isActive }) => {
-                                                return (
-                                                    <div
-                                                        className={cl("flex items-center p-2 rounded-lg hover:bg-bg_hover", {
-                                                            "bg-black hover:bg-black text-white": isActive,
-                                                            " text-color": !isActive,
-                                                        })}
-                                                    >
-                                                        <span className="mr-2 p-2">{icon}</span>
-                                                        <span className="text-base leading-relaxed text-inherit font-medium">{name}</span>
-                                                    </div>
-                                                )
-                                            }}
-                                        </NavLink>
-                                    </li>
-                                ))}
+                                {pages.map(
+                                    ({ icon, name, path }) =>
+                                        icon && (
+                                            <li key={name}>
+                                                <NavLink to={`/${layout}${path}`}>
+                                                    {({ isActive }) => {
+                                                        return (
+                                                            <div
+                                                                className={cl("flex items-center p-2 rounded-lg hover:bg-bg_hover", {
+                                                                    "bg-black hover:bg-black text-white": isActive,
+                                                                    " text-color": !isActive,
+                                                                })}
+                                                            >
+                                                                <span className="mr-2 p-2">{icon}</span>
+                                                                <span className="text-base leading-relaxed text-inherit font-medium">{name}</span>
+                                                            </div>
+                                                        )
+                                                    }}
+                                                </NavLink>
+                                            </li>
+                                        )
+                                )}
                             </ul>
                         )
                     })}

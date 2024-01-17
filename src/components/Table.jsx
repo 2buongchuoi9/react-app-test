@@ -6,57 +6,45 @@ const CheckComponent = ({ index, onChange, isCheck }) => {
         <div key={`checkbox-${index}`} className="p-4 w-4">
             <div className="flex items-center">
                 <input
-                    id={`checkbox-table-${index}`}
                     type="checkbox"
                     checked={isCheck}
                     onChange={() => onChange(index)}
                     className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
-                <label htmlFor={`checkbox-table-${index}`} className="sr-only">
-                    checkbox
-                </label>
             </div>
         </div>
     )
 }
 
-const Table = ({ header, data }) => {
+const Table = ({ header, data, onEdit, onDelete, setSelectedRow: _setSelectRow }) => {
     const [selectRow, setSelectRow] = useState({})
     const [checkAll, setCheckAll] = useState(false)
 
-    console.log(selectRow)
+    // const renderCell = (key, value, record) => {}
 
     useEffect(() => {
         setCheckAll(isAllRowsChecked())
+        // send the selectedRow to parent component
+        _setSelectRow && _setSelectRow(selectRow)
     }, [selectRow])
 
     const isAllRowsChecked = () => {
-        return data.length > 0 && selectRow.length === data.length
+        return data.length > 0 && Object.keys(selectRow).length === data.length
     }
 
     const handleOnChangeSelectRow = (index) => {
-        const selectedRowKey = data[index].key.key
+        const key = data[index].key
 
         setSelectRow((prev) => {
             const newSelect = { ...prev }
 
-            if (newSelect[selectedRowKey]) {
-                delete newSelect[selectedRowKey]
+            if (newSelect[key]) {
+                delete newSelect[key]
             } else {
-                newSelect[selectedRowKey] = true
+                newSelect[key] = true
             }
             return newSelect
         })
-
-        // const selectedRow = data[index]
-
-        // if (selectRow.some((item) => item.key === selectedRow.key)) {
-        //     // Hủy chọn nếu đã chọn
-        //     setSelectRow(selectRow.filter((item) => item.key !== selectedRow.key))
-        // } else {
-        //     // Chọn nếu chưa chọn
-        //     setSelectRow((prevSelectRow) => [...prevSelectRow, selectedRow])
-        // }
     }
 
     const handleCheckAll = () => {
@@ -71,16 +59,6 @@ const Table = ({ header, data }) => {
         } else {
             setSelectRow({})
         }
-
-        // setCheckAll(!checkAll)
-
-        // if (!checkAll) {
-        //     // Nếu chưa chọn tất cả, chọn tất cả các hàng
-        //     setSelectRow([...data])
-        // } else {
-        //     // Nếu đã chọn tất cả, hủy chọn tất cả các hàng
-        //     setSelectRow([])
-        // }
     }
 
     return (
@@ -92,15 +70,11 @@ const Table = ({ header, data }) => {
                             <th scope="col" className="p-4">
                                 <div className="flex items-center">
                                     <input
-                                        id="checkbox-all"
                                         type="checkbox"
                                         checked={checkAll}
                                         onChange={handleCheckAll}
                                         className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500"
                                     />
-                                    <label htmlFor="checkbox-all" className="sr-only">
-                                        checkbox
-                                    </label>
                                 </div>
                             </th>
                             {header &&
@@ -108,33 +82,74 @@ const Table = ({ header, data }) => {
                                     <th
                                         key={i}
                                         scope="col"
-                                        className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
+                                        className="py-2 px-3 text-xs font-medium tracking-wider text-left text-gray-700 uppercase"
                                     >
-                                        {v}
+                                        {v.title}
                                     </th>
                                 ))}
-                            <th scope="col" className="p-4">
-                                <span className="sr-only">Edit</span>
+                            <th scope="col" className="py-2 px-3 text-xs font-medium tracking-wider text-left text-gray-700 uppercase">
+                                <span className="">Edit</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {data &&
+                            data.map((item, rowIndex) => {
+                                const row = [
+                                    <td key="checkbox">
+                                        <CheckComponent index={rowIndex} onChange={handleOnChangeSelectRow} isCheck={selectRow[item.key] || false} />
+                                    </td>,
+                                ]
+
+                                header &&
+                                    header.forEach((column, colIndex) => {
+                                        const cellValue = item[column.dataIndex]
+                                        const cellContent = column.render ? column.render(cellValue, item) : cellValue
+
+                                        row.push(
+                                            <td key={colIndex} className="px-3">
+                                                {cellContent}
+                                            </td>
+                                        )
+                                    })
+
+                                {
+                                    row.push(
+                                        <td key="edit" className="space-x-1">
+                                            <button
+                                                onClick={() => onDelete(item)}
+                                                className="p-2 text-sm text-red-100 transition-colors duration-150 bg-red-700 rounded-lg focus:shadow-outline hover:bg-red-800"
+                                            >
+                                                delete
+                                            </button>
+                                            <button
+                                                onClick={() => onEdit(item)}
+                                                className="p-2 text-sm text-blue-100 transition-colors duration-150 bg-blue-600 rounded-lg focus:shadow-outline hover:bg-blue-700"
+                                            >
+                                                edit
+                                            </button>
+                                        </td>
+                                    )
+                                }
+
+                                return (
+                                    <tr key={rowIndex} onClick={item.onClick} className={item.className}>
+                                        {row}
+                                    </tr>
+                                )
+                            })}
+
+                        {/* {data &&
                             data.map((item, index) => (
                                 <tr key={index} onClick={item.onClick} className={item.className}>
                                     <td>
-                                        <CheckComponent
-                                            index={index}
-                                            onChange={handleOnChangeSelectRow}
-                                            isCheck={selectRow[item.key] || false}
-                                            // isCheck={selectRow.some((selected) => selected.key === item.key)}
-                                        />
+                                        <CheckComponent index={index} onChange={handleOnChangeSelectRow} isCheck={selectRow[item.key] || false} />
                                     </td>
                                     {Object.entries(item).map(([key, value], i) => {
                                         return key !== "key" ? <td key={i}>{value}</td> : null
                                     })}
                                 </tr>
-                            ))}
+                            ))} */}
                     </tbody>
                 </table>
             </div>
@@ -143,8 +158,17 @@ const Table = ({ header, data }) => {
 }
 
 Table.propTypes = {
-    header: PropTypes.array,
+    header: PropTypes.arrayOf(
+        PropTypes.shape({
+            dataIndex: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            title: PropTypes.string.isRequired,
+            render: PropTypes.func,
+        })
+    ),
     data: PropTypes.array,
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func,
+    setSelectedRow: PropTypes.func,
 }
 
 CheckComponent.propTypes = {

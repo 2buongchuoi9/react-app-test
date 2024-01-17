@@ -26,7 +26,7 @@ const Tabs = ({ children, ...props }) => {
                     </div>
                 ))}
             </div>
-            <div className="py-4">
+            <div className="">
                 {children.map((child) => {
                     if (child.props.label === activeTab) {
                         return <div key={child.props.label}>{child.props.children}</div>
@@ -38,9 +38,9 @@ const Tabs = ({ children, ...props }) => {
     )
 }
 
-const Tab = ({ label, children }) => {
+const Tab = ({ label, children, className }) => {
     return (
-        <div label={label} className="hidden">
+        <div label={label} className={cl("hidden", { className: !!className })}>
             {children}
         </div>
     )
@@ -52,6 +52,7 @@ Tabs.propTypes = {
 Tab.propTypes = {
     children: PropTypes.array,
     label: PropTypes.string,
+    className: PropTypes.string,
 }
 
 export { Tabs, Tab }

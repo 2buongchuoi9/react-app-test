@@ -17,7 +17,7 @@ const Breadcrumbs = () => {
         })
 
     return (
-        <div className="space-x-2 flex ">
+        <div className="space-x-2 flex justify-center items-center pl-3">
             {crumbs.map((v, index) => {
                 return (
                     <div key={v.path} className="space-x-2 text-base font-normal leading-relaxed">
