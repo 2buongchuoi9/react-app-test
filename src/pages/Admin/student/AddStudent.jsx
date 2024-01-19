@@ -5,11 +5,13 @@ import { StatusStudent } from "~/utils/constan"
 import http from "~/utils/httpRequest"
 
 import PropTypes from "prop-types"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 // import Alert from "~/components/Alert"
 
 const AddStudent = ({ isAdd = true }) => {
     // const [curentStudent, setCurrentStudent] = useState()
+
+    const navigate = useNavigate()
 
     const [std, setStd] = useState({})
 
@@ -38,7 +40,7 @@ const AddStudent = ({ isAdd = true }) => {
             }
         }
         fetchOrther()
-    }, [isAdd, id])
+    }, [isAdd])
 
     const handleSelectImage = (img) => {
         // setImage(img.url)
@@ -54,8 +56,10 @@ const AddStudent = ({ isAdd = true }) => {
 
         try {
             // setIsLoading(true)
-            isAdd ? await http.post("/student", std) : await http.post(`/student/${id}`, std)
+            const a = isAdd ? await http.post("/student", std) : await http.post(`/student/${id}`, std)
             alert((isAdd ? "add" : "update") + " is success")
+            console.log(a)
+            navigate(`/admin/student/update/${a.data.id}`)
         } catch (error) {
             console.log(error)
             alert(error?.response?.data?.message || "err")

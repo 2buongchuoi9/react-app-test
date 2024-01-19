@@ -57,7 +57,7 @@ const FileUploaderDownloader = () => {
             responseType: "blob",
         })
 
-        console.log(data)
+        // console.log(data)
 
         const resultFileURL = window.URL.createObjectURL(new Blob([data.data]))
 

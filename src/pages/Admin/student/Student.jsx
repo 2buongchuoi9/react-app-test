@@ -1,3 +1,4 @@
+import { TreeSelect } from "antd"
 import classNames from "classnames"
 import { useEffect, useRef, useState } from "react"
 import { IoIosSearch } from "react-icons/io"
@@ -47,8 +48,7 @@ const header = [
 const Student = () => {
     const [showAction, setShowAction] = useState(false)
     const [students, setStudents] = useState([])
-    const [clazzs, setClazzs] = useState([])
-    const [schools, setSchools] = useState([])
+
     const [selectStatus, setSelectStatus] = useState("")
     const [selectedOption, setSelectedOption] = useState({ type: "", value: "" })
 
@@ -61,6 +61,8 @@ const Student = () => {
     const [alert, setAlert] = useState({ isVisible: false, content: "" })
     const [externalSelectRow, setExternalSelectRow] = useState({})
 
+    const [tree, setTree] = useState([])
+
     const debouncedSearch = useDebounce(search, 500)
 
     const inputRef = useRef()
@@ -69,11 +71,32 @@ const Student = () => {
         const fetchOrther = async () => {
             const dataSchool = await http.get("/school?limit=1000&page=1")
             const dataClazz = await http.get("/class?limit=1000&page=1")
-            setSchools(dataSchool.data.content)
-            setClazzs(dataClazz.data.content)
+
+            console.log(dataSchool.data.content)
+            console.log(dataClazz.data.content)
+
+            const scl = dataSchool.data.content.map((v) => ({
+                // ...dataSchool.data.content,
+                id: v.id,
+                pId: 0,
+                value: "school_" + v.id,
+                title: `${v.name} (${v.id})`,
+                isLeaf: false,
+            }))
+            const cla = dataClazz.data.content.map((v) => ({
+                // ...dataClazz.data.content,
+                id: v.id,
+                pId: v.schoolId,
+                value: "class_" + v.id,
+                title: `${v.code} (${v.id})`,
+                // isLeaf: true,
+            }))
+
+            setTree([{ id: "", pId: 0, value: "", title: "Select school or class", isLeaf: true }, ...scl, ...cla])
         }
         fetchOrther()
     }, [])
+    console.log(tree)
 
     const fetchApi = async () => {
         setLoading(true)
@@ -101,9 +124,11 @@ const Student = () => {
         setPageSize(pageSize)
     }
 
-    const handleSelectOnChange = (target) => {
-        const { name, value } = target
+    const handleSelectOnChange = (data) => {
+        const { name, value } = data
+        console.log(data)
         console.log(selectedOption)
+        setPage(1)
         setSelectedOption({ type: value ? name : "", value })
     }
 
@@ -164,11 +189,31 @@ const Student = () => {
     return (
         <>
             {loading && <Loading />}
+
             <div>
                 <div className="flex justify-between items-center space-x-6 mb-3">
                     <div className="flex justify-center items-center space-x-3">
+                        <TreeSelect
+                            className="w-[300px]"
+                            defaultValue={""}
+                            treeDataSimpleMode
+                            // style={{
+                            //     width: "70%",
+                            // }}
+                            dropdownStyle={{
+                                maxHeight: 400,
+                                overflow: "auto",
+                            }}
+                            onChange={(v) => {
+                                const a = v.split("_")
+                                console.log(a)
+                                handleSelectOnChange(v ? { name: a[0], value: a[1] } : { name: "", value: "" })
+                            }}
+                            treeData={tree}
+                        />
+
                         {/* search with school id */}
-                        <div className="relative h-10 w-56 min-w-10">
+                        {/* <div className="relative h-10 w-56 min-w-10">
                             <select
                                 name="school"
                                 onChange={(e) => handleSelectOnChange(e.target)}
@@ -181,9 +226,9 @@ const Student = () => {
                             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-medium text-sm leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                                 school
                             </label>
-                        </div>
+                        </div> */}
                         {/* search with class id */}
-                        <div className="relative h-10 w-56 min-w-10">
+                        {/* <div className="relative h-10 w-56 min-w-10">
                             <select
                                 name="class"
                                 onChange={(e) => handleSelectOnChange(e.target)}
@@ -196,7 +241,7 @@ const Student = () => {
                             <label className="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none text-[11px] font-medium text-sm leading-tight text-blue-gray-400 transition-all before:pointer-events-none before:mt-[6.5px] before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l before:border-blue-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-blue-gray-200 after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-blue-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-gray-900 peer-focus:before:border-t-2 peer-focus:before:border-l-2 peer-focus:before:border-gray-900 peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-gray-900 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent peer-disabled:peer-placeholder-shown:text-blue-gray-500">
                                 class
                             </label>
-                        </div>
+                        </div> */}
 
                         {/* search with status */}
                         <div className="relative h-10 w-56 min-w-10">
@@ -204,6 +249,7 @@ const Student = () => {
                                 name="class"
                                 onChange={(e) => {
                                     setSelectStatus(e.target.value)
+                                    setPage(1)
                                     setSearch("")
                                 }}
                                 value={selectStatus}
