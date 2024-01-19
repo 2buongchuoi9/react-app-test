@@ -1,4 +1,6 @@
+import AddStudent from "./AddStudent"
+
 const UpdateStudent = () => {
-    return <div>update student</div>
+    return <AddStudent isAdd={false} />
 }
 export default UpdateStudent

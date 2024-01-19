@@ -11,7 +11,7 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-white/45 ">
             <SideNav items={routes}></SideNav>
-            <div className="p-4 ml-80 h-[1000px]">
+            <div className="p-4 ml-72 h-[1000px]">
                 <DashboardNavbar />
                 {/* <Table header={header} data={data} /> */}
 

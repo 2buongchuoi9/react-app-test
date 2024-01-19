@@ -7,7 +7,7 @@ const cl = classNames.bind()
 
 function SideNav({ items }) {
     return (
-        <aside className="fixed inset-0 my-4 ml-4 h-[calc(100vh-32px)] w-72 rounded-xl border border-blue-gray-100 text-color">
+        <aside className="fixed inset-0 my-4 ml-4 h-[calc(100vh-32px)] w-64 rounded-xl border border-blue-gray-100 text-color">
             <div className="relative">
                 <Link to={"/"} className="text-center">
                     <img className="mx-auto py-2" width={200} src={logo} alt="" />

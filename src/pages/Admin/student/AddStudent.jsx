@@ -1,61 +1,77 @@
 import { useEffect, useState } from "react"
+import Loading from "~/components/Loading"
 import ModalImage from "~/components/ModalImage"
 import { StatusStudent } from "~/utils/constan"
 import http from "~/utils/httpRequest"
 
-const AddStudent = () => {
+import PropTypes from "prop-types"
+import { useParams } from "react-router-dom"
+// import Alert from "~/components/Alert"
+
+const AddStudent = ({ isAdd = true }) => {
+    // const [curentStudent, setCurrentStudent] = useState()
+
+    const [std, setStd] = useState({})
+
     const [clazzs, setClazzs] = useState([])
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [address, setAddress] = useState("")
-    const [clazzId, setClazzId] = useState(1)
-    const [birthday, setBirthday] = useState("")
-    const [phone, setPhone] = useState("")
-    const [status, setStatus] = useState(0)
-    const [image, setImage] = useState("")
 
     const [showImage, setShowImage] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const { id } = useParams()
+    // console.log("id", id)
+
+    console.log(std)
 
     useEffect(() => {
         const fetchOrther = async () => {
             const dataClazz = await http.get("/class?limit=1000&page=1")
             setClazzs(dataClazz.data.content)
+            if (!isAdd && id) {
+                let data
+                try {
+                    data = await http.get(`/student/${id}`)
+                } catch (error) {
+                    alert(error.response.data.message)
+                }
+                setStd(data.data)
+            }
         }
         fetchOrther()
-    }, [])
+    }, [isAdd, id])
 
     const handleSelectImage = (img) => {
-        console.log(img)
-        setImage(img.url)
+        // setImage(img.url)
+        setStd((prev) => ({ ...prev, image: img.url }))
         setShowImage(false)
     }
     const handleOnSubmit = async () => {
         // validate
 
-        const data = {
-            name,
-            email,
-            address,
-            clazzId,
-            birthday,
-            phone,
-            status,
-            image,
+        console.log(std)
+
+        console.log("id::::", id)
+
+        try {
+            // setIsLoading(true)
+            isAdd ? await http.post("/student", std) : await http.post(`/student/${id}`, std)
+            alert((isAdd ? "add" : "update") + " is success")
+        } catch (error) {
+            console.log(error)
+            alert(error?.response?.data?.message || "err")
         }
-
-        // try {
-        //     await http.post("/student", data)
-        // } catch (error) {}
-
-        console.log("submit", data)
+        setIsLoading(false)
+        console.log("submit", std)
     }
+
     return (
         <div>
+            {isLoading && <Loading />}
             <ModalImage isVisible={showImage} onClose={() => setShowImage(false)} onSelectImage={handleSelectImage}></ModalImage>
             <div className="min-h-screen p-6 bg-gray-100 flex items-center justify-center">
                 <div className="container max-w-screen-lg mx-auto">
                     <div>
-                        <h2 className="font-semibold text-xl text-gray-600">Form student</h2>
+                        <h2 className="font-semibold text-xl text-gray-600">{isAdd ? "Add sudent" : "Update student"}</h2>
                         <p className="text-gray-500 mb-6"></p>
 
                         <div className="bg-white rounded shadow-lg p-4 px-4 md:p-8 mb-6">
@@ -63,7 +79,7 @@ const AddStudent = () => {
                                 <div className="text-gray-600 space-y-2">
                                     <p className="font-medium text-lg">Student Details</p>
                                     <div className="min-h-40 w-40 rounded-lg overflow-hidden">
-                                        {image && <img src={image} alt="" className="w-40 h-40 object-cover" />}
+                                        {std?.image && <img src={std.image} alt="" className="w-40 h-40 object-cover" />}
                                     </div>
                                     <button
                                         onClick={() => setShowImage(true)}
@@ -78,8 +94,8 @@ const AddStudent = () => {
                                         <div className="md:col-span-3">
                                             <label>Name</label>
                                             <input
-                                                onChange={(e) => setName(e.target.value)}
-                                                value={name}
+                                                onChange={(e) => setStd((prev) => ({ ...prev, name: e.target.value }))}
+                                                value={std?.name}
                                                 type="text"
                                                 className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                                             />
@@ -92,15 +108,15 @@ const AddStudent = () => {
                                                 name="full_name"
                                                 id="full_name"
                                                 className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
-                                                value=""
+                                                value={std?.code}
                                             />
                                         </div>
 
                                         <div className="md:col-span-5">
                                             <label>Email</label>
                                             <input
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                value={email}
+                                                onChange={(e) => setStd((prev) => ({ ...prev, email: e.target.value }))}
+                                                value={std?.email}
                                                 type="text"
                                                 className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                                                 placeholder="email@domain.com"
@@ -110,8 +126,8 @@ const AddStudent = () => {
                                         <div className="md:col-span-3">
                                             <label>Address</label>
                                             <input
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                value={address}
+                                                onChange={(e) => setStd((prev) => ({ ...prev, address: e.target.value }))}
+                                                value={std?.address}
                                                 type="text"
                                                 className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                                                 placeholder=""
@@ -121,8 +137,8 @@ const AddStudent = () => {
                                         <div className="md:col-span-2">
                                             <label>Class</label>
                                             <select
-                                                onChange={(e) => setClazzId(e.target.value)}
-                                                value={clazzId}
+                                                onChange={(e) => setStd((prev) => ({ ...prev, clazzId: Number(e.target.value) }))}
+                                                value={std?.clazzId}
                                                 className="w-full h-10 border mt-1 rounded px-4 bg-gray-50 "
                                             >
                                                 {clazzs && clazzs.map((v) => <option key={v.id} value={v.id}>{`${v.code} (${v.id})`}</option>)}
@@ -133,8 +149,8 @@ const AddStudent = () => {
                                             <label>birthday</label>
                                             <div className="h-10 bg-gray-50 flex border border-gray-200 rounded items-center mt-1">
                                                 <input
-                                                    onChange={(e) => setBirthday(e.target.value)}
-                                                    value={birthday}
+                                                    onChange={(e) => setStd((prev) => ({ ...prev, birthday: e.target.value }))}
+                                                    value={std?.birthday}
                                                     type="text"
                                                     placeholder="Birthday"
                                                     className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
@@ -146,8 +162,9 @@ const AddStudent = () => {
                                             <label>phone</label>
                                             <div className="h-10 bg-gray-50 flex border border-gray-200 rounded items-center mt-1">
                                                 <input
-                                                    onChange={(e) => setPhone(e.target.value)}
-                                                    value={phone}
+                                                    type="text"
+                                                    onChange={(e) => setStd((prev) => ({ ...prev, phone: e.target.value }))}
+                                                    value={std?.phone}
                                                     placeholder="phone"
                                                     className="h-10 border mt-1 rounded px-4 w-full bg-gray-50"
                                                 />
@@ -157,8 +174,8 @@ const AddStudent = () => {
                                         <div className="md:col-span-1">
                                             <label>Status</label>
                                             <select
-                                                onChange={(e) => setStatus(e.target.value)}
-                                                value={status}
+                                                onChange={(e) => setStd((prev) => ({ ...prev, status: e.target.value }))}
+                                                value={std?.status}
                                                 className="w-full h-10 border mt-1 rounded px-4 bg-gray-50 "
                                             >
                                                 {Object.keys(StatusStudent).map((k) => (
@@ -210,4 +227,9 @@ const AddStudent = () => {
         </div>
     )
 }
+
+AddStudent.propTypes = {
+    isAdd: PropTypes.bool,
+}
+
 export default AddStudent

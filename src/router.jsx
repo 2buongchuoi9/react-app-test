@@ -1,9 +1,11 @@
 import { VscSymbolClass } from "react-icons/vsc"
 import { PiStudent } from "react-icons/pi"
 import { IoSchoolOutline, IoHomeOutline } from "react-icons/io5"
+import { BsFileEarmarkExcel } from "react-icons/bs"
 import School from "./pages/Admin/school/School"
 import Student from "./pages/Admin/student/Student"
 import AddStudent from "./pages/Admin/student/AddStudent"
+import ImportExport from "./pages/Admin/ImportExport"
 import UpdateStudent from "./pages/Admin/student/UpdateStudent"
 // import Dashboard from "./layouts/Dashboard"
 
@@ -39,9 +41,15 @@ export const routes = [
                 path: "/student",
                 element: <Student />,
             },
+            {
+                icon: <BsFileEarmarkExcel {...icon} />,
+                name: "Import-Export",
+                path: "/file",
+                element: <ImportExport />,
+            },
 
             { path: "/student/add", element: <AddStudent /> },
-            { path: "/student/update", element: <UpdateStudent /> },
+            { path: "/student/update/:id", element: <UpdateStudent /> },
         ],
     },
 ]

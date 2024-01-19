@@ -1,9 +1,10 @@
 import classNames from "classnames"
 import { useEffect, useRef, useState } from "react"
 import { IoIosSearch } from "react-icons/io"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import Alert from "~/components/Alert"
 import Loading from "~/components/Loading"
+import ModalEditMany from "~/components/ModalEditMany"
 // import Modal from "~/components/Modal"
 import Pagination from "~/components/Pagination"
 import Table from "~/components/Table"
@@ -44,7 +45,7 @@ const header = [
 ]
 
 const Student = () => {
-    // const [show, setShow] = useState(false)
+    const [showAction, setShowAction] = useState(false)
     const [students, setStudents] = useState([])
     const [clazzs, setClazzs] = useState([])
     const [schools, setSchools] = useState([])
@@ -76,7 +77,6 @@ const Student = () => {
 
     const fetchApi = async () => {
         setLoading(true)
-        // const strSelect = selectSchool ? `/school/${selectSchool}` : selectClazz ? `/class/${selectClazz}` : ""
         const strSelect = selectedOption.type ? `/${selectedOption.type}/${selectedOption.value}` : ""
         const searchQuery = debouncedSearch ? `/search/${debouncedSearch}` : ""
         const sttQuery = selectStatus ? `&status=${selectStatus}` : ""
@@ -112,6 +112,8 @@ const Student = () => {
     }
 
     const handleAction = () => {
+        setShowAction(true)
+        console.log(externalSelectRow)
         const newArray = Object.keys(externalSelectRow).map((key) => students.find((v) => v.id == key))
         console.log("newArray", newArray)
         console.log("action")
@@ -137,14 +139,32 @@ const Student = () => {
             onClose: () => setAlert((prev) => ({ ...prev, isVisible: false })),
         })
     }
+    const navigate = useNavigate()
     const handleEdit = (item) => {
         console.log("edit", item)
+        navigate(`/admin/student/update/${item.id}`)
+    }
+    const handleCallApiToUpdateManyData = async (status, clazzId) => {
+        const ids = Object.keys(externalSelectRow)
+
+        let data
+
+        try {
+            setLoading(true)
+            data = await http.post("/student/update-many", { ids, status, clazzId })
+        } catch (error) {
+            console.log(error)
+        }
+        console.log(data)
+        setShowAction(false)
+        await fetchApi()
+        setLoading(false)
     }
 
     return (
         <>
+            {loading && <Loading />}
             <div>
-                {loading && <Loading />}
                 <div className="flex justify-between items-center space-x-6 mb-3">
                     <div className="flex justify-center items-center space-x-3">
                         {/* search with school id */}
@@ -182,7 +202,10 @@ const Student = () => {
                         <div className="relative h-10 w-56 min-w-10">
                             <select
                                 name="class"
-                                onChange={(e) => setSelectStatus(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectStatus(e.target.value)
+                                    setSearch("")
+                                }}
                                 value={selectStatus}
                                 className="peer h-full w-full rounded-[7px] border bg-white border-blue-gray-200 border-t-transparent px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200  focus:border-2 focus:border-gray-900 focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-blue-gray-50"
                             >
@@ -242,6 +265,11 @@ const Student = () => {
                 </button>
                 <Modal isVisible={show} onClose={() => setShow(false)}></Modal> */}
                 <Alert {...alert} />
+                <ModalEditMany
+                    isVisible={showAction}
+                    onClose={() => setShowAction(false)}
+                    onSubmit={({ status, clazzId }) => handleCallApiToUpdateManyData(status, clazzId)}
+                />
             </div>
         </>
     )

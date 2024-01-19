@@ -107,7 +107,7 @@ const Table = ({ header, data, onEdit, onDelete, setSelectedRow: _setSelectRow }
                                         const cellContent = column.render ? column.render(cellValue, item) : cellValue
 
                                         row.push(
-                                            <td key={colIndex} className="px-3">
+                                            <td key={colIndex} className="py-2 px-3 text-xs font-medium text-left text-gray-700">
                                                 {cellContent}
                                             </td>
                                         )

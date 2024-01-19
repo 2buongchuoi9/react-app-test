@@ -21,8 +21,31 @@ const Pagination = ({ page, totalPage, onChange, pageSizelist, pageSize }) => {
         onChange({ page: 1, pageSize: newPageSize })
     }
 
-    const range = (start, end) => {
-        return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+    const range = (displayedPages) => {
+        const adjacentCount = Math.floor(displayedPages / 2)
+        let start = Math.max(1, page - adjacentCount)
+        let end = start + displayedPages - 1
+
+        if (end > totalPage) {
+            end = totalPage
+            start = Math.max(1, end - displayedPages + 1)
+        }
+
+        const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
+
+        // Add '...' at the beginning if there are more pages before start
+        if (start > 1) {
+            pages.unshift("...")
+            pages.unshift(1)
+        }
+
+        // Add '...' at the end if there are more pages after end
+        if (end < totalPage) {
+            pages.push("...")
+            pages.push(totalPage)
+        }
+
+        return pages
     }
 
     return (
@@ -39,7 +62,7 @@ const Pagination = ({ page, totalPage, onChange, pageSizelist, pageSize }) => {
                                 Prev
                             </button>
                         </li>
-                        {range(1, totalPage).map((pageNumber) => (
+                        {range(10).map((pageNumber) => (
                             <li key={pageNumber}>
                                 <button
                                     key={pageNumber}
